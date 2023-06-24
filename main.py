@@ -1,5 +1,4 @@
 import itertools
-
 import torch
 import torch.nn as nn
 import torchvision.datasets as datasets
@@ -38,7 +37,7 @@ transform = transforms.Compose([
 
 lr = 2e-4
 batch_size = 1
-num_epochs = 25
+num_epochs = 20
 epochs = data['epochs']
 # epochs = torch.load("epochs.pth")
 
