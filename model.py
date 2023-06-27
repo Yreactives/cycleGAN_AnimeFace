@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import os
 import cv2
-import numpy
+
 class ResnetBlock(nn.Module):
     def __init__(self, dim, use_dropout):
         super(ResnetBlock, self).__init__()
@@ -49,6 +49,8 @@ class Generator_Res(nn.Module):
             nn.InstanceNorm2d(pm * 4),
             nn.ReLU(True),
 
+            # 9 resblocks if 256 * 256 or higher else 6 resblock
+
             # Resblocks # 1
             ResnetBlock(dim=64, use_dropout=use_dropout),
             # Resblocks # 2
@@ -60,6 +62,12 @@ class Generator_Res(nn.Module):
             # Resblocks # 5
             ResnetBlock(dim=64, use_dropout=use_dropout),
             # Resblocks # 6
+            ResnetBlock(dim=64, use_dropout=use_dropout),
+            # Resblocks # 7
+            ResnetBlock(dim=64, use_dropout=use_dropout),
+            # Resblocks # 8
+            ResnetBlock(dim=64, use_dropout=use_dropout),
+            # Resblocks # 9
             ResnetBlock(dim=64, use_dropout=use_dropout),
 
             # Upsampling
@@ -126,9 +134,10 @@ def saveimage(tensorlist, filepath, unique:bool=False):
 
             numpy_image = numpy_image * 255
             numpy_image = cv2.cvtColor(numpy_image, cv2.COLOR_BGR2RGB)
-            img = cv2.imshow("image", numpy_image)
+            #img = cv2.imshow("image", numpy_image)
             os.chdir(dr)
             cv2.imwrite("img"+str(x)+".png", numpy_image)
 
-        x += 1
+
     os.chdir(firstdir)
+    return "img" + str(x) + ".png"

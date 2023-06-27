@@ -21,11 +21,6 @@ generator2.load_state_dict(data['generator2'])
 discriminator.load_state_dict(data['discriminator'])
 discriminator2.load_state_dict(data['discriminator2'])
 
-# generator = torch.load("generator.pth")
-# generator2 = torch.load("generator2.pth").to(device)
-# discriminator = torch.load("discriminator.pth").to(device)
-# discriminator2 = torch.load("discriminator2.pth").to(device)
-
 criterionMSE = nn.MSELoss()
 criterionMAE = nn.L1Loss()
 
@@ -38,8 +33,9 @@ transform = transforms.Compose([
 lr = 2e-4
 batch_size = 1
 num_epochs = 20
+#epochs = 0
 epochs = data['epochs']
-# epochs = torch.load("epochs.pth")
+
 
 writer1 = SummaryWriter(f'runs/anime')
 writer2 = SummaryWriter(f'runs/human')
@@ -61,8 +57,19 @@ disc_Optimizer = torch.optim.Adam(itertools.chain(discriminator.parameters(), di
 gen_Optimizer.load_state_dict(data['gen_Optimizer'])
 disc_Optimizer.load_state_dict(data['disc_Optimizer'])
 step = 0
+generator2.train()
+generator.train()
+discriminator.train()
+discriminator2.train()
 
+# only for learning rate editing purpose no need to use if not necessary
+#gen_Optimizer.param_groups[0]['lr'] = lr
+#disc_Optimizer.param_groups[0]['lr'] = lr
 for epoch in range(num_epochs):
+    if epoch+epochs >= 100:
+        # learning rate decay after 100 epoch
+        gen_Optimizer.param_groups[0]['lr'] *= 0.993
+        disc_Optimizer.param_groups[0]['lr'] *= 0.993
     for batch_idx, (real_anime, real_human) in enumerate(zip(loader_anime, loader_human)):
         real_anime = real_anime[0].to(device)
         real_human = real_human[0].to(device)
@@ -128,7 +135,7 @@ for epoch in range(num_epochs):
         a_dis_loss.backward()
         disc_Optimizer.step()
 
-        if batch_idx % 150 == 0:
+        if batch_idx % 200 == 0:
             print(f"Epoch [{epoch + 1 + epochs}/{num_epochs+epochs}] Batch {batch_idx}/{len(loader_anime)} \
                         Loss DiscA: {a_dis_loss:.4f}, Loss DiscB: {b_dis_loss:.4f} \n"
                   f"loss_GenA: {a_total_loss:.4f}, loss_GenB: {b_total_loss:.4f}"
@@ -137,7 +144,7 @@ for epoch in range(num_epochs):
             with torch.no_grad():
                 img_grid_real = torchvision.utils.make_grid(
                     real_anime, normalize=True
-                )
+                )   
                 img_grid_fake = torchvision.utils.make_grid(
                     a_fake, normalize=True
                 )
