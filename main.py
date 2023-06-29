@@ -32,7 +32,7 @@ transform = transforms.Compose([
 
 lr = 2e-4
 batch_size = 1
-num_epochs = 20
+num_epochs = 10
 #epochs = 0
 epochs = data['epochs']
 
@@ -68,8 +68,8 @@ discriminator2.train()
 for epoch in range(num_epochs):
     if epoch+epochs >= 100:
         # learning rate decay after 100 epoch
-        gen_Optimizer.param_groups[0]['lr'] *= 0.993
-        disc_Optimizer.param_groups[0]['lr'] *= 0.993
+        gen_Optimizer.param_groups[0]['lr'] *= 0.954991
+        disc_Optimizer.param_groups[0]['lr'] *= 0.954991
     for batch_idx, (real_anime, real_human) in enumerate(zip(loader_anime, loader_human)):
         real_anime = real_anime[0].to(device)
         real_human = real_human[0].to(device)
